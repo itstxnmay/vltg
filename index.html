@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="VLTG® — Premium minimal tech-wear. Built for the grid. Worn off it.">
+<title>VLTG® — Premium Tech-Wear</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#EAE5DF;--accent:#0A0A0A;--text:#0A0A0A;--white:#fff;--ease:cubic-bezier(0.16,1,0.3,1)}
+html{scroll-behavior:smooth;cursor:none}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;cursor:none}
+body.loading{overflow:hidden}
+a{color:inherit;text-decoration:none;cursor:none}
+img{display:block;width:100%;height:100%;object-fit:cover}
+
+/* CUSTOM CURSOR */
+.cursor{position:fixed;top:0;left:0;width:18px;height:18px;background:var(--white);border-radius:50%;pointer-events:none;z-index:10000;transform:translate(-50%,-50%);mix-blend-mode:difference;transition:width .35s var(--ease),height .35s var(--ease)}
+.cursor.hover{width:54px;height:54px}
+
+/* LOADER */
+#loader{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column}
+.loader-black{background:#0A0A0A;height:25vh;transform-origin:top}
+.loader-cream{background:var(--bg);flex:1;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.loader-blocks{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:75vw;height:50vh}
+.block{background:var(--accent);position:absolute;opacity:0}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:24px 30px;display:flex;justify-content:space-between;align-items:center;mix-blend-mode:difference;opacity:0}
+nav *{color:var(--white)}
+.nav-logo{font-family:'Anton',sans-serif;font-size:20px;letter-spacing:2px}
+.nav-right{display:flex;align-items:center;gap:40px}
+.nav-right a{font-family:'Inter',sans-serif;font-size:14px;letter-spacing:.5px;text-transform:uppercase;position:relative}
+.nav-right a.shop-link::after{content:'';position:absolute;bottom:-2px;left:0;width:100%;height:1px;background:var(--white)}
+.theme-dots{display:flex;align-items:center;gap:6px;cursor:pointer}
+.theme-dots span{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--white);transition:background .3s var(--ease)}
+.theme-dots span:first-child{background:var(--white)}
+.theme-dots span:last-child{background:transparent}
+
+/* HERO */
+#hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:120px 30px 0;position:relative}
+.hero-word{font-family:'Anton',sans-serif;font-size:clamp(120px,28vw,400px);line-height:.85;letter-spacing:-0.02em;color:var(--accent);text-transform:uppercase;overflow:hidden;white-space:nowrap;width:100%;text-align:center}
+.hero-word span{display:inline-block;transform:translateY(120px);opacity:0}
+.hero-reg{font-size:.3em;vertical-align:super;font-weight:400}
+.hero-divider{width:100%;height:3px;background:var(--accent);margin:30px 0 20px;transform:scaleX(0);transform-origin:left}
+.hero-info{display:grid;grid-template-columns:1fr 2fr 1fr auto;gap:20px;padding:10px 0 60px;align-items:start;opacity:0;transform:translateY(30px)}
+.hero-info-brand{font-family:'Inter',sans-serif;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:1px}
+.hero-info-manifesto h4{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;color:var(--accent)}
+.hero-info-manifesto p{font-size:13px;line-height:1.6;max-width:420px;opacity:.7}
+.hero-info-links{display:flex;flex-direction:column;gap:10px}
+.hero-info-links a{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:1px}
+.hero-info-year{font-size:13px;font-weight:500;opacity:.7}
+
+/* PRODUCTS */
+#products{padding:0 30px 100px}
+.product-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.product-grid .product-card:nth-child(5){grid-column:1/3}
+.product-grid .product-card:nth-child(6){grid-column:3/5}
+.product-card{cursor:pointer;position:relative}
+.product-img{position:relative;aspect-ratio:3/4;overflow:hidden;background:#d5d0ca}
+.product-card:nth-child(5) .product-img,
+.product-card:nth-child(6) .product-img{aspect-ratio:16/9}
+.product-img img{transition:transform .55s var(--ease)}
+.product-img .img-default{position:relative;z-index:1;transition:transform .55s var(--ease)}
+.product-img .img-hover{position:absolute;inset:0;z-index:2;transform:translateX(100%);transition:transform .55s var(--ease)}
+.product-card:hover .product-img .img-default{transform:translateX(-8%) scale(1.03)}
+.product-card:hover .product-img .img-hover{transform:translateX(0) scale(1.03)}
+.product-hover{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:3}
+.product-hover-circle{width:0;height:0;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;transition:width .4s var(--ease),height .4s var(--ease);overflow:hidden}
+.product-card:hover .product-hover-circle{width:130px;height:130px}
+.product-hover-circle span{color:var(--white);font-size:12px;font-weight:600;letter-spacing:2px;text-transform:uppercase;white-space:nowrap;opacity:0;transition:opacity .3s var(--ease) .1s}
+.product-card:hover .product-hover-circle span{opacity:1}
+.product-info{display:flex;justify-content:space-between;align-items:flex-start;padding:14px 0 4px}
+.product-name{font-size:15px;font-weight:500}
+.product-price{font-size:15px;font-weight:500}
+.product-tag{font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;display:flex;align-items:center;gap:6px;opacity:.6}
+.product-tag::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block}
+
+/* ============================================
+   EMERGE SECTION — in-flow image growth
+   Images sit BETWEEN text lines in flex column.
+   Growing their size naturally pushes text apart.
+   ============================================ */
+#emerge-section{
+  position:relative;
+  height:100vh;
+}
+.emerge-pin{
+  position:relative;
+  height:100vh;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.emerge-inner{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  width:100%;
+  height:100%;
+}
+.emerge-text{
+  font-family:'Anton',sans-serif;
+  font-size:clamp(48px,7vw,110px);
+  line-height:1;
+  color:var(--accent);
+  text-transform:uppercase;
+  text-align:center;
+  letter-spacing:-0.01em;
+  flex-shrink:0;
+  width:100%;
+  will-change:transform;
+}
+/* The images container: starts at 0×0, grows from center */
+.emerge-images{
+  display:flex;
+  gap:8px;
+  flex-shrink:0;
+  overflow:hidden;
+  width:0;
+  height:0;
+  will-change:width,height;
+}
+.emerge-img{
+  flex:1;
+  min-width:0;
+  overflow:hidden;
+}
+.emerge-img img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:center 20%;
+  display:block;
+  will-change:transform;
+}
+
+
+/* FOOTER */
+footer{padding:60px 30px 40px;position:relative;background:var(--accent);color:var(--bg)}
+.footer-divider{width:100%;height:3px;background:var(--bg);opacity:.15;margin-bottom:50px}
+.footer-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:80px}
+.footer-statement{font-family:'Anton',sans-serif;font-size:clamp(40px,6vw,90px);line-height:1.05;text-transform:uppercase;color:var(--bg);max-width:65%}
+.footer-year{font-family:'Anton',sans-serif;font-size:clamp(80px,12vw,180px);color:var(--bg);line-height:.85;display:flex;align-items:flex-start;opacity:.15}
+.footer-year-c{font-size:.5em;line-height:1;margin-right:-5px}
+.footer-copy{font-size:14px;line-height:1.7;max-width:600px;margin-bottom:80px;opacity:.55;color:var(--bg)}
+.footer-bottom{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 1fr;gap:30px;padding-top:30px;border-top:1px solid rgba(234,229,223,.15)}
+.footer-col h5{font-size:13px;font-weight:600;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px;color:var(--bg)}
+.footer-col p,.footer-col a{font-size:13px;line-height:2;opacity:.5;display:block;transition:opacity .3s;color:var(--bg)}
+.footer-col a:hover{opacity:1}
+.footer-brand{font-family:'Anton',sans-serif;font-size:18px;letter-spacing:2px;margin-bottom:6px;color:var(--bg)}
+.footer-brand-sub{font-size:12px;opacity:.4;color:var(--bg)}
+
+/* FOOTER BOUNCE WORDMARK */
+.footer-wordmark{
+  display:flex;
+  align-items:flex-end;
+  overflow:hidden;
+  height:32vw;
+  margin-top:60px;
+  margin-left:-30px;
+  margin-right:-30px;
+  margin-bottom:-40px;
+}
+.fw-letter{
+  font-family:'Anton',sans-serif;
+  font-size:32vw;
+  line-height:0.88;
+  color:var(--bg);
+  flex:1;
+  text-align:center;
+  display:block;
+  transform:translateY(110%);
+  will-change:transform;
+  opacity:0.08;
+}
+
+/* SCROLL REVEAL */
+.reveal{opacity:0;transform:translateY(40px)}
+
+/* THEME LIGHT VARIANT */
+body.theme-light{--bg:#FAFAFA;background:var(--bg)}
+
+/* SCREEN GLOW — warm amber vignette from all 4 edges */
+.screen-glow{
+  position:fixed;inset:0;pointer-events:none;z-index:99;
+  animation:glowPulse 6s ease-in-out infinite alternate;
+}
+.screen-glow::before,
+.screen-glow::after{
+  content:'';position:absolute;inset:0;
+}
+.screen-glow::before{
+  background:
+    radial-gradient(ellipse 45% 110% at -5% 50%,  rgba(210,120,40,0.55) 0%, transparent 70%),
+    radial-gradient(ellipse 45% 110% at 105% 50%, rgba(210,120,40,0.55) 0%, transparent 70%);
+}
+.screen-glow::after{
+  background:
+    radial-gradient(ellipse 110% 40% at 50% -5%,  rgba(195,110,35,0.45) 0%, transparent 70%),
+    radial-gradient(ellipse 110% 40% at 50% 105%, rgba(220,140,50,0.50) 0%, transparent 70%);
+}
+@keyframes glowPulse{
+  0%{opacity:.85}
+  100%{opacity:1}
+}
+body.theme-light .screen-glow{opacity:.6}
+
+
+</style>
+</head>
+<body class="loading">
+
+<!-- CURSOR -->
+<div class="cursor" id="cursor"></div>
+
+<!-- SCREEN GLOW -->
+<div class="screen-glow" id="screenGlow"></div>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="loader-black"></div>
+  <div class="loader-cream">
+    <div class="loader-blocks" id="loaderBlocks"></div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav id="navbar">
+  <div class="nav-right">
+    <a href="#products" class="shop-link">Shop</a>
+    <a href="#">Cart (0)</a>
+    <div class="theme-dots" id="themeDots">
+      <span></span>
+      <span></span>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-word" id="heroWord">
+    <span>V</span><span>L</span><span>T</span><span>G</span><span class="hero-reg">®</span>
+  </div>
+  <div class="hero-divider" id="heroDivider"></div>
+  <div class="hero-info" id="heroInfo">
+    <div class="hero-info-brand">VLTG</div>
+    <div class="hero-info-manifesto">
+      <h4>Manifesto</h4>
+      <p>Engineered by the VLTG collective, this capsule merges precision utility with raw street energy. Every thread is intentional.</p>
+    </div>
+    <div class="hero-info-links">
+      <a href="#">VISIT WEBSITE</a>
+      <a href="#">SHIPPING & RETURNS</a>
+    </div>
+    <div class="hero-info-year">© 2026</div>
+  </div>
+</section>
+
+<!-- PRODUCTS -->
+<section id="products">
+  <div class="product-grid">
+    <div class="product-card reveal">
+      <div class="product-img">
+        <img class="img-default" src="images/black-jacket.png" alt="Stealth Shell Jacket" loading="lazy">
+        <img class="img-hover" src="images/black-jacket-hover.png" alt="Stealth Shell Jacket Alternate" loading="lazy">
+        <div class="product-hover"><div class="product-hover-circle"><span>VIEW MORE</span></div></div>
+      </div>
+      <div class="product-info"><span class="product-name">Stealth Shell</span><span class="product-price">$180.00</span></div>
+      <div class="product-tag">APPAREL</div>
+    </div>
+    <div class="product-card reveal">
+      <div class="product-img">
+        <img class="img-default" src="images/cargo-pants.png" alt="Grid Cargo Pants" loading="lazy">
+        <img class="img-hover" src="images/cargo-pants-hover.png" alt="Grid Cargo Pants Alternate" loading="lazy">
+        <div class="product-hover"><div class="product-hover-circle"><span>VIEW MORE</span></div></div>
+      </div>
+      <div class="product-info"><span class="product-name">Grid Cargo</span><span class="product-price">$140.00</span></div>
+      <div class="product-tag">APPAREL</div>
+    </div>
+    <div class="product-card reveal">
+      <div class="product-img">
+        <img class="img-default" src="images/tech-vest.png" alt="Voltage Tech Vest" loading="lazy">
+        <img class="img-hover" src="images/tech-vest-hover.png" alt="Voltage Tech Vest Alternate" loading="lazy">
+        <div class="product-hover"><div class="product-hover-circle"><span>VIEW MORE</span></div></div>
+      </div>
+      <div class="product-info"><span class="product-name">Voltage Vest</span><span class="product-price">$120.00</span></div>
+      <div class="product-tag">APPAREL</div>
+    </div>
+    <div class="product-card reveal">
+      <div class="product-img">
+        <img class="img-default" src="images/bucket-hat.png" alt="Signal Bucket Hat" loading="lazy">
+        <img class="img-hover" src="images/bucket-hat-hover.png" alt="Signal Bucket Hat Alternate" loading="lazy">
+        <div class="product-hover"><div class="product-hover-circle"><span>VIEW MORE</span></div></div>
+      </div>
+      <div class="product-info"><span class="product-name">Signal Bucket</span><span class="product-price">$60.00</span></div>
+      <div class="product-tag">APPAREL</div>
+    </div>
+    <div class="product-card reveal">
+      <div class="product-img">
+        <img class="img-default" src="images/roller-bag.png" alt="Transit Roller Bag" loading="lazy">
+        <img class="img-hover" src="images/roller-bag-hover.png" alt="Transit Roller Bag Alternate" loading="lazy">
+        <div class="product-hover"><div class="product-hover-circle"><span>VIEW MORE</span></div></div>
+      </div>
+      <div class="product-info"><span class="product-name">Transit Roller</span><span class="product-price">$220.00</span></div>
+      <div class="product-tag">APPAREL</div>
+    </div>
+    <div class="product-card reveal">
+      <div class="product-img">
+        <img class="img-default" src="images/utility-tote.png" alt="Utility Tote" loading="lazy">
+        <img class="img-hover" src="images/utility-tote-hover.png" alt="Utility Tote Alternate" loading="lazy">
+        <div class="product-hover"><div class="product-hover-circle"><span>VIEW MORE</span></div></div>
+      </div>
+      <div class="product-info"><span class="product-name">Utility Tote</span><span class="product-price">$90.00</span></div>
+      <div class="product-tag">APPAREL</div>
+    </div>
+  </div>
+</section>
+
+<!-- EMERGE SECTION — in-flow image growth -->
+<section id="emerge-section">
+  <div class="emerge-pin" id="emergePin">
+    <div class="emerge-inner">
+      <div class="emerge-text" id="emergeLine1">DISCOVER</div>
+      <div class="emerge-images" id="emergeImages">
+        <div class="emerge-img">
+          <img src="images/black-jacket.png" alt="Stealth Shell">
+        </div>
+        <div class="emerge-img">
+          <img src="images/tech-vest.png" alt="Voltage Vest">
+        </div>
+      </div>
+      <div class="emerge-text" id="emergeLine2">THE COLLECTION</div>
+    </div>
+  </div>
+</section>
+
+
+
+
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-divider"></div>
+  <div class="footer-top">
+    <div class="footer-statement">Built for the grid.<br>Worn off it.</div>
+    <div class="footer-year"><span class="footer-year-c">©</span>26</div>
+  </div>
+  <p class="footer-copy">Engineered by the VLTG collective, this store and capsule collection represents our commitment to precision utility and raw street energy. Every detail is intentional.</p>
+  <div class="footer-bottom">
+    <div class="footer-col">
+      <div class="footer-brand">VLTG</div>
+      <p class="footer-brand-sub">All rights reserved © 2026</p>
+    </div>
+    <div class="footer-col">
+      <p>Grid District 7</p>
+      <p>Studio 204</p>
+      <p>New York, NY</p>
+    </div>
+    <div class="footer-col">
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Service</a>
+    </div>
+    <div class="footer-col">
+      <a href="#">Instagram</a>
+      <a href="#">Twitter (X)</a>
+      <a href="#">LinkedIn</a>
+    </div>
+    <div class="footer-col">
+      <a href="#">Work</a>
+      <a href="#">About</a>
+      <a href="#">Careers</a>
+      <a href="#">Contact</a>
+    </div>
+  </div>
+
+  <!-- BOUNCE WORDMARK -->
+  <div class="footer-wordmark" id="footerWordmark">
+    <span class="fw-letter" id="fl0">V</span>
+    <span class="fw-letter" id="fl1">L</span>
+    <span class="fw-letter" id="fl2">T</span>
+    <span class="fw-letter" id="fl3">G</span>
+  </div>
+
+</footer>
+
+<script>
+/* ===== CUSTOM CURSOR ===== */
+const cursor = document.getElementById('cursor');
+let mx = 0, my = 0, cx = 0, cy = 0;
+document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+(function loop() {
+  cx += (mx - cx) * 0.15; cy += (my - cy) * 0.15;
+  cursor.style.left = cx + 'px'; cursor.style.top = cy + 'px';
+  requestAnimationFrame(loop);
+})();
+document.querySelectorAll('a, button, .product-card, .feature-wrap, .theme-dots, .catalog-card').forEach(el => {
+  el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+  el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+});
+
+/* ===== THEME TOGGLE ===== */
+const dots = document.getElementById('themeDots');
+const dotSpans = dots.querySelectorAll('span');
+let isLight = false;
+dots.addEventListener('click', () => {
+  isLight = !isLight;
+  document.body.classList.toggle('theme-light', isLight);
+  dotSpans[0].style.background = isLight ? 'transparent' : 'var(--white)';
+  dotSpans[1].style.background = isLight ? 'var(--white)' : 'transparent';
+});
+
+/* ===== LOADER — GEOMETRIC BLOCK ASSEMBLY ===== */
+// Build "VLTG" from rectangular blocks (like reference "OUTFIT" but for VLTG)
+// Blocks are now relative to a centered 75vw x 50vh container
+// x goes 0→100% across 75vw, y goes 0→100% across 50vh
+// Letter group starts at x=4%, total width ~70%, vertically centered at y=10%→90%
+const blockData = [
+  // V - left stroke
+  {x:4,   y:10, w:5,   h:35}, {x:6,   y:45, w:5,   h:20},
+  // V - right stroke
+  {x:16,  y:10, w:5,   h:35}, {x:14,  y:45, w:5,   h:20},
+  // V - bottom point
+  {x:8,   y:62, w:8,   h:10},
+  // L - vertical
+  {x:27,  y:10, w:6,   h:60},
+  // L - horizontal
+  {x:27,  y:66, w:16,  h:8},
+  // T - top bar
+  {x:48,  y:10, w:18,  h:8},
+  // T - vertical
+  {x:55,  y:18, w:5,   h:54},
+  // G - top bar
+  {x:72,  y:10, w:20,  h:8},
+  // G - left vertical
+  {x:72,  y:10, w:6,   h:62},
+  // G - bottom
+  {x:72,  y:68, w:20,  h:8},
+  // G - right stub
+  {x:86,  y:42, w:6,   h:28},
+  // G - middle bar
+  {x:80,  y:42, w:12,  h:7},
+];
+const loaderBlocks = document.getElementById('loaderBlocks');
+blockData.forEach(b => {
+  const div = document.createElement('div');
+  div.className = 'block';
+  div.style.cssText = `left:${b.x}%;top:${b.y}%;width:${b.w}%;height:${b.h}%`;
+  loaderBlocks.appendChild(div);
+});
+const blocks = loaderBlocks.querySelectorAll('.block');
+
+const tl = gsap.timeline({ onComplete: () => {
+  document.body.classList.remove('loading');
+  revealPage();
+}});
+
+// Black bar slides up
+tl.to('.loader-black', { height: 0, duration: .6, ease: 'power3.inOut', delay: .3 });
+
+// Blocks fly in from random positions
+blocks.forEach((block, i) => {
+  const rx = (Math.random() - .5) * 300;
+  const ry = (Math.random() - .5) * 300;
+  const rr = (Math.random() - .5) * 180;
+  gsap.set(block, { x: rx, y: ry, rotation: rr, opacity: 0, scale: .3 });
+  tl.to(block, { x: 0, y: 0, rotation: 0, opacity: 1, scale: 1, duration: .6, ease: 'power3.out' }, .5 + i * .04);
+});
+
+// Hold, then fade out loader
+tl.to({}, { duration: .6 })
+  .to('#loader', { opacity: 0, duration: .5, ease: 'power2.inOut' })
+  .set('#loader', { display: 'none' });
+
+/* ===== PAGE REVEAL ANIMATIONS ===== */
+function revealPage() {
+  gsap.registerPlugin(ScrollTrigger);
+
+  // Nav fade in
+  gsap.to('nav', {
+    opacity: 1, duration: .6,
+    ease: 'power3.out', delay: .1
+  });
+
+  // Hero word letters stagger in (animate TO visible state)
+  gsap.to('#heroWord span', {
+    y: 0, opacity: 1, duration: 1, stagger: .08,
+    ease: 'power3.out', delay: .1
+  });
+
+  // Hero divider width
+  gsap.to('#heroDivider', {
+    scaleX: 1, duration: .8,
+    ease: 'power3.out', delay: .6
+  });
+
+  // Hero info fade up
+  gsap.to('#heroInfo', {
+    y: 0, opacity: 1, duration: .7,
+    ease: 'power3.out', delay: .8
+  });
+
+  // Scroll-triggered reveals for products & feature
+  document.querySelectorAll('.reveal').forEach(el => {
+    gsap.to(el, {
+      opacity: 1, y: 0, duration: .8, ease: 'power3.out',
+      scrollTrigger: { trigger: el, start: 'top 85%', once: true }
+    });
+  });
+
+  // Footer statement
+  gsap.from('.footer-statement', {
+    y: 60, opacity: 0, duration: 1, ease: 'power3.out',
+    scrollTrigger: { trigger: '.footer-statement', start: 'top 85%', once: true }
+  });
+  gsap.from('.footer-year', {
+    y: 60, opacity: 0, duration: 1, ease: 'power3.out', delay: .15,
+    scrollTrigger: { trigger: '.footer-year', start: 'top 85%', once: true }
+  });
+
+
+
+  // ===== EMERGE SECTION — in-flow image growth =====
+  // Images are IN the flex column between the two text lines.
+  // Growing their width/height naturally pushes text apart.
+  // No clip-path, no absolute positioning, no spacer hacks.
+  const eImages = document.getElementById('emergeImages');
+  // Final dimensions: images fill most of viewport
+  const finalW = window.innerWidth * 0.88;
+  const finalH = window.innerHeight * 0.68;
+
+  // Start at 0×0 (invisible)
+  gsap.set(eImages, { width: 0, height: 0 });
+  gsap.set('.emerge-img img', { scale: 1.15 });
+
+  const emergeTL = gsap.timeline({
+    scrollTrigger: {
+      trigger: '#emerge-section',
+      start: 'top top',
+      end: '+=300%',
+      scrub: 1.5,
+      pin: true,
+      anticipatePin: 1,
+      fastScrollEnd: true,
+      preventOverlaps: true,
+      invalidateOnRefresh: true,
+    }
+  });
+
+  // Images grow from 0×0 to full size — text gets pushed apart automatically
+  emergeTL.to(eImages, {
+    width: finalW,
+    height: finalH,
+    ease: 'power1.inOut',
+    duration: 1,
+  }, 0);
+
+  // Subtle Ken Burns zoom-out on images
+  emergeTL.to('.emerge-img img', {
+    scale: 1.0,
+    ease: 'power1.inOut',
+    duration: 1,
+  }, 0);
+
+
+
+  // ===== FOOTER BOUNCE WORDMARK =====
+  const fwLetters = document.querySelectorAll('.fw-letter');
+  // Explicitly set starting state via GSAP (overrides CSS)
+  gsap.set(fwLetters, { y: '110%', opacity: 0 });
+
+  ScrollTrigger.create({
+    trigger: '#footerWordmark',
+    start: 'top 95%',
+    once: true,
+    onEnter: () => {
+      gsap.to(fwLetters, {
+        y: 0,
+        opacity: 1,
+        duration: 1.6,
+        ease: 'elastic.out(1, 0.55)',
+        stagger: { each: 0.1, from: 'start' }
+      });
+    }
+  });
+}
+</script>
+</body>
+</html>
